@@ -1,0 +1,16 @@
+# Build output
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.pdb
+
+# IDE and OS droppings
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+Thumbs.db
+desktop.ini
+.DS_Store

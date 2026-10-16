@@ -1,0 +1,69 @@
+{
+	"schema": 1,
+	"updated": "2026-10-15",
+	"about": "ModGate's default policy. Pass -Policy=<path> to use your own copy and -Profile=<name> to pick a profile. Rule IDs: M1 Blueprint script, M2 dangerous engine function, M3 native code, M4 script or shell file, M5 command text, M6 config file, M7 file type not allowed, M8 not inspectable (always block), M9 unnamed native reference, M10 shader code, M11 game classes used. Severities: block, warn, info, off.",
+	"defaultProfile": "data-only",
+	"profiles": {
+		"data-only": {
+			"about": "Mods carry data only. Any Blueprint script is blocked, because compiled Blueprints can't be sandboxed.",
+			"severity": { "M1": "block", "M2": "block", "M3": "block", "M4": "block", "M5": "warn", "M6": "block", "M7": "block", "M9": "warn", "M10": "info", "M11": "info" }
+		},
+		"blueprint-mods": {
+			"about": "Harm reduction for games that already accept Blueprint mods. Blueprint script is a warning; calls to known-dangerous functions are still blocked. A crafted Blueprint can still escape: the interpreter does no type checks.",
+			"severity": { "M1": "warn", "M2": "block", "M3": "block", "M4": "block", "M5": "warn", "M6": "block", "M7": "block", "M9": "warn", "M10": "info", "M11": "info" }
+		}
+	},
+	"folderAllowedExtensions": [ ".pak", ".utoc", ".ucas", ".sig", ".bin", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".json", ".txt", ".md", ".vdf", ".uplugin", ".uasset", ".umap", ".uexp", ".ubulk" ],
+	"containerAllowedExtensions": [ ".uasset", ".uexp", ".umap", ".ubulk", ".uptnl",".ushaderbytecode", ".upipelinecache", ".uplugin", ".json", ".txt", ".png", ".jpg", ".bin", ".locres", ".locmeta", ".ttf", ".otf", ".ufont", ".wav", ".ogg", ".bk2", ".mp4", ".udic" ],
+	"nativeExtensions": [ ".exe", ".dll", ".so", ".dylib", ".sys", ".drv", ".ocx", ".cpl", ".scr", ".com", ".pif", ".msi", ".msp", ".msix", ".appx", ".app", ".jar", ".pyd", ".node" ],
+	"scriptExtensions": [ ".bat", ".cmd", ".ps1", ".psm1", ".psd1", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".lnk", ".url", ".reg", ".inf", ".py", ".pyc", ".pyw", ".sh", ".bash", ".zsh", ".command", ".scpt", ".applescript", ".lua", ".rb", ".pl", ".php" ],
+	"configExtensions": [ ".ini" ],
+	"shaderExtensions": [ ".ushaderbytecode", ".ushadercode", ".shk" ],
+	"executableClasses": [
+		"/Script/CoreUObject.Class",
+		"/Script/CoreUObject.Function",
+		"/Script/CoreUObject.DelegateFunction",
+		"/Script/CoreUObject.SparseDelegateFunction",
+		"/Script/Engine.BlueprintGeneratedClass",
+		"/Script/Engine.AnimBlueprintGeneratedClass",
+		"/Script/UMG.WidgetBlueprintGeneratedClass",
+		"/Script/GameplayAbilities.GameplayAbilityBlueprintGeneratedClass",
+		"/Script/ControlRig.ControlRigBlueprintGeneratedClass",
+		"/Script/RigVM.RigVMBlueprintGeneratedClass"
+	],
+	"riskyFunctions": [
+		{ "path": "/Script/Engine.KismetSystemLibrary:LaunchURL", "category": "process", "severity": "block", "why": "Opens any URL through the operating system shell. Unless Engine.ini restricts it, file:// and other schemes run programs. Meccha Chameleon's Workshop malware ran its batch file this way." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:LaunchExternalUrl", "category": "process", "severity": "block", "why": "Opens a URL through the operating system shell with a domain list the caller supplies, so a mod can allow itself anything." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:ExecuteConsoleCommand", "category": "console", "severity": "block", "why": "Runs console commands and sets console variables. What that can do depends on the build and the game." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:GetPlatformUserDir", "category": "recon", "severity": "warn", "why": "Finds the player's Documents folder, outside the game. Meccha Chameleon's Workshop malware wrote its batch file there." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:GetPlatformUserName", "category": "recon", "severity": "warn", "why": "Reads the player's operating system user name." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:GetCommandLine", "category": "recon", "severity": "warn", "why": "Reads the game's command line, which can hold tokens and server addresses." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:GetUniqueDeviceId", "category": "recon", "severity": "warn", "why": "Reads a device identifier." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:GetDeviceId", "category": "recon", "severity": "warn", "why": "Reads a device identifier." },
+		{ "path": "/Script/Engine.KismetSystemLibrary:ConvertToAbsolutePath", "category": "recon", "severity": "warn", "why": "Builds absolute file system paths, usually to reach outside the game folder." },
+		{ "path": "/Script/Engine.KismetRenderingLibrary:ExportRenderTarget", "category": "file-write", "severity": "block", "why": "Writes an image file to any path the caller names." },
+		{ "path": "/Script/Engine.KismetRenderingLibrary:ExportTexture2D", "category": "file-write", "severity": "block", "why": "Writes an image file to any path the caller names." },
+		{ "path": "/Script/Engine.KismetRenderingLibrary:ImportFileAsTexture2D", "category": "file-read", "severity": "warn", "why": "Reads any file on disk that decodes as an image." },
+		{ "path": "/Script/Engine.GameplayStatics:DeleteGameInSlot", "category": "file-write", "severity": "warn", "why": "Deletes a save file. The slot name becomes part of a file path." },
+		{ "path": "/Script/JsonBlueprintUtilities.JsonBlueprintFunctionLibrary:ToFile", "category": "file-write", "severity": "block", "why": "Writes JSON text to any path, with no folder restriction. Meccha Chameleon's Workshop malware wrote a JSON/batch polyglot to Documents\\s.bat this way." },
+		{ "path": "/Script/JsonBlueprintUtilities.JsonBlueprintFunctionLibrary:FromFile", "category": "file-read", "severity": "warn", "why": "Reads any JSON file on disk." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:CopyFile", "category": "file-write", "severity": "block", "why": "Copies files anywhere the game process can write." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:MoveFile", "category": "file-write", "severity": "block", "why": "Moves files anywhere the game process can write." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:DeleteFile", "category": "file-write", "severity": "block", "why": "Deletes files anywhere the game process can write." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:DeleteDirectory", "category": "file-write", "severity": "block", "why": "Deletes folders, optionally recursively." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:MakeDirectory", "category": "file-write", "severity": "block", "why": "Creates folders anywhere the game process can write." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:FindFiles", "category": "recon", "severity": "warn", "why": "Lists files in any folder." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:FindRecursive", "category": "recon", "severity": "warn", "why": "Lists files and folders recursively from any folder." },
+		{ "path": "/Script/BlueprintFileUtils.BlueprintFileUtilsBPLibrary:GetUserDirectory", "category": "recon", "severity": "warn", "why": "Finds the player's user folder, outside the game." },
+		{ "path": "/Script/PythonScriptPlugin.PythonScriptLibrary:ExecutePythonCommand", "category": "process", "severity": "block", "why": "Runs Python, with full access to the machine, in editor builds such as cooked-editor mod kits." },
+		{ "path": "/Script/PythonScriptPlugin.PythonScriptLibrary:ExecutePythonCommandEx", "category": "process", "severity": "block", "why": "Runs Python, with full access to the machine, in editor builds such as cooked-editor mod kits." },
+		{ "path": "/Script/PythonScriptPlugin.PythonScriptLibrary:ExecutePythonScript", "category": "process", "severity": "block", "why": "Runs Python, with full access to the machine, in editor builds such as cooked-editor mod kits." },
+		{ "path": "/Script/PythonScriptPlugin.PythonScriptLibrary:ForceEnablePythonAtRuntime", "category": "process", "severity": "block", "why": "Turns Python on in a running editor build." },
+		{ "path": "/Script/WebBrowserWidget.WebBrowser:ExecuteJavascript", "category": "browser", "severity": "block", "why": "Runs JavaScript in the game's embedded browser." },
+		{ "path": "/Script/WebBrowserWidget.WebBrowser:LoadString", "category": "browser", "severity": "warn", "why": "Loads HTML the caller supplies into the embedded browser." },
+		{ "path": "/Script/WebBrowserWidget.WebBrowser:LoadURL", "category": "network", "severity": "warn", "why": "Loads any URL into the embedded browser." },
+		{ "path": "/Script/HttpBlueprint.HttpRequestProxyObject:CreateHttpRequestProxyObject", "category": "network", "severity": "block", "why": "Sends HTTP requests to any server, which can download payloads or upload player data." }
+	],
+	"riskyNamePattern": "(File|Directory|Folder|Process|Shell|Command|Console|Url|URL|Http|HTTP|Socket|Download|Upload|Python|Registry|Clipboard)",
+	"suspiciousStrings": [ "powershell", "pwsh", "cmd.exe", "cmd /c", "cmd /k", "/c start", "-executionpolicy", "-ep bypass", "-encodedcommand", "invoke-webrequest", "invoke-expression", "start-process", "downloadstring", "downloadfile", "iwr ", "iex ", "certutil", "bitsadmin", "mshta", "rundll32", "regsvr32", "wscript", "cscript", "schtasks", "%temp%", "%appdata%", "%userprofile%", "$env:temp", "\\appdata\\", "/bin/sh", "/bin/bash", "chmod +x", "curl -", "wget " ]
+}

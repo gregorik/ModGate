@@ -1,0 +1,10 @@
+* text=auto
+*.pak binary
+*.utoc binary
+*.ucas binary
+*.uasset binary
+*.umap binary
+*.uexp binary
+*.png binary
+*.jpg binary
+*.webp binary

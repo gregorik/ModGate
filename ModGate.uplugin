@@ -1,0 +1,20 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "ModGate",
+	"Description": "Free mod package risk check for UE 5.5-5.8. Flags and blocks executable content in mod packages (Blueprint script, calls to dangerous engine functions, native code, scripts, config) without loading them, and restricts LaunchURL to https. Headless commandlet with CI exit codes and JSON/HTML reports.",
+	"Category": "Editor",
+	"CreatedBy": "GregOrigin",
+	"CreatedByURL": "www.gregorigin.com",
+	"DocsURL": "https://gregorigin.com/Manuals/ModGate",
+	"MarketplaceURL": "",
+	"SupportURL": "https://discord.gg/nqYQ5mtmHb",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Modules": [
+		{ "Name": "ModGate", "Type": "Editor", "LoadingPhase": "Default", "PlatformAllowList": [ "Win64", "Linux", "Android" ] },
+		{ "Name": "ModGateEditor", "Type": "Editor", "LoadingPhase": "PostEngineInit", "PlatformAllowList": [ "Win64", "Linux", "Android" ] }
+	]
+}
